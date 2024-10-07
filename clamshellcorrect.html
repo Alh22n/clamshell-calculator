@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clamshell Box Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input {
+            margin: 10px 0;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clamshell Box Calculator</h1>
+    <p>Enter your height (H), length (L), and width (W) as mixed numbers (e.g., 5 3/10).</p>
+
+    <label for="height">Height (H): </label>
+    <input type="text" id="height" placeholder="e.g., 5 3/10"><br>
+    
+    <label for="length">Length (L): </label>
+    <input type="text" id="length" placeholder="e.g., 19 3/10"><br>
+    
+    <label for="width">Width (W): </label>
+    <input type="text" id="width" placeholder="e.g., 12 3/10"><br>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        function parseMixedNumber(input) {
+            // Split the input string into whole and fractional parts
+            let parts = input.trim().split(' ');
+            let whole = 0;
+            let fraction = 0;
+
+            if (parts.length === 2) {
+                whole = parseFloat(parts[0]);
+                let fractionParts = parts[1].split('/');
+                fraction = parseFloat(fractionParts[0]) / parseFloat(fractionParts[1]);
+            } else if (parts.length === 1) {
+                if (parts[0].includes('/')) {
+                    let fractionParts = parts[0].split('/');
+                    fraction = parseFloat(fractionParts[0]) / parseFloat(fractionParts[1]);
+                } else {
+                    whole = parseFloat(parts[0]);
+                }
+            }
+
+            return whole + fraction;
+        }
+
+        function formatFraction(decimal) {
+            let whole = Math.floor(decimal);
+            let remainder = decimal - whole;
+            let denominator = 10;
+            let numerator = Math.round(remainder * denominator);
+
+            if (numerator === 0) return whole;
+            return whole > 0 ? `${whole} ${numerator}/10` : `${numerator}/10`;
+        }
+
+        function calculate() {
+            let height = parseMixedNumber(document.getElementById('height').value);
+            let length = parseMixedNumber(document.getElementById('length').value);
+            let width = parseMixedNumber(document.getElementById('width').value);
+
+            // Seam allowance of 3/10 applied once at the beginning
+            let h = height + 3 / 10;
+            let l = length + 3 / 10;
+            let w = width + 3 / 10;
+
+            let results = "<h2>Length Formula Results</h2>";
+            let lengthResults = [];
+
+            // Length Formula (5 Steps)
+            lengthResults.push(h);
+            lengthResults.push(h + 3 / 10);
+            lengthResults.push(h + 3 / 10 + l);
+            lengthResults.push(h + 3 / 10 + l + 3 / 10);
+            lengthResults.push(h + 3 / 10 + l + 3 / 10 + h);
+
+            for (let i = 0; i < lengthResults.length; i++) {
+                results += `Step ${i + 1}: ${formatFraction(lengthResults[i])}<br>`;
+            }
+
+            results += "<h2>Width Formula Results</h2>";
+            let widthResults = [];
+
+            // Width Formula (9 Steps)
+            widthResults.push(h);
+            widthResults.push(h + 6 / 10);
+            widthResults.push(h + 6 / 10 + (h + 3 / 10));
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8));
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8) + (h + 7 / 10));
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8) + (h + 7 / 10) + (w + 1));
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8) + (h + 7 / 10) + (w + 1) + (h + 3 / 10));
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8) + (h + 7 / 10) + (w + 1) + (h + 3 / 10) + 6 / 10);
+            widthResults.push(h + 6 / 10 + (h + 3 / 10) + (w + 1.8) + (h + 7 / 10) + (w + 1) + (h + 3 / 10) + 6 / 10 + h);
+
+            for (let i = 0; i < widthResults.length; i++) {
+                results += `Step ${i + 1}: ${formatFraction(widthResults[i])}<br>`;
+            }
+
+            document.getElementById('results').innerHTML = results;
+        }
+    </script>
+</body>
+</html>
